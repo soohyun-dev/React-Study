@@ -13,8 +13,6 @@
 
 ---
 
-<br>
-
 ### useState
 
 <br>
@@ -23,13 +21,11 @@
 const [index, setIndex] = useState(0);
 ```
 
-<br>
-
 - index는 state 변수다.
 - setIndex는 setter 함수이다.
-  <br>
+  <br><br>
 
-  동작법
+### setter 함수 선언
 
 ```javascript
 function handleClick() {
@@ -47,12 +43,12 @@ Hook은 React가 렌더링하는 동안에만 사용할 수 있는 특수한 기
 
 ### 컨벤션
 
-- setter 함수에는 state변수 앞에 set을 붙이는 형식으로 이름을 짓는다.
-- useState argument로는 state 초깃값을 준다.
-
 ```javascript
 const [something, setSomething] = useState(0);
 ```
+
+- setter 함수에는 state변수 앞에 set을 붙이는 형식으로 이름을 짓는다.
+- useState argument로는 state 초깃값을 준다.
 
 <br>
 
@@ -71,7 +67,7 @@ const [index, setIndex] = useState(0);
 5. 변한 state값 기억
 6. 컴포넌트 리렌더링
 7. [1, setIndx] return
-   <br>
+   <br><br>
 
 ### State는 독립적이다.
 
@@ -81,13 +77,7 @@ const [index, setIndex] = useState(0);
 
 <br>
 
----
-
-<br>
-
 ## 👨‍💻 정리
-
-<br>
 
 - 컴포넌트가 렌더링 도중 일부 정보를 기억해야 하는 경우 state를 사용한다.
 

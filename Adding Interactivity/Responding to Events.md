@@ -123,11 +123,7 @@ function Button({ onClick, children }) {
 
 <br>
 
----
-
-<br>
-
-### 👨‍💻 정리
+## 👨‍💻 정리
 
 <br>
 
