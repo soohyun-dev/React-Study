@@ -1,0 +1,235 @@
+## Updating Objects in State
+
+### 📌 학습 목표
+
+- React state에서 객체를 올바르게 업데이트하는 방법
+- 중첩된 객체를 변경하지 않고 업데이트하는 방법
+- 불변성이란 무엇인지, 그리고 불변성을 지키는 방법
+- Immer로 반복을 줄여 객체를 복사하는 방법
+
+---
+
+<br>
+
+### 변경이란?
+
+```javascript
+const [position, setPosition] = useState({ x: 0, y: 0 });
+
+setPosition.x = 5;
+```
+
+- 객체 자체의 내용을 바꿀 수는 있다.
+- 하지만 리액트 state는 변경 가능할지라도 불변성을 가진 것처럼 다루어야 한다.
+- 객체를 변경하는 대신 교체해야한다.
+
+#### 즉, state는 읽기 전용처럼 다루자.
+
+<br>
+
+- react에서 state 설정 함수가 없으면 객체가 변경되었는지 알 수 없다.
+
+<br>
+설정함수는 다음과 같이 요청한다.
+- position을 이 새로운 객체로 교체하라.
+- 교체 후 이 컴포넌트를 다시 렌더링하라.
+
+<br>
+
+### 스프레드 문법으로 객체 copy하기
+
+```javascript
+import { useState } from "react";
+
+export default function Form() {
+  const [person, setPerson] = useState({
+    firstName: "Barbara",
+    lastName: "Hepworth",
+    email: "bhepworth@sculpture.com",
+  });
+
+  function handleChange(e) {
+    setPerson({
+      ...person,
+      [e.target.name]: e.target.value,
+    });
+  }
+
+  return (
+    <>
+      <label>
+        First name:
+        <input
+          name="firstName"
+          value={person.firstName}
+          onChange={handleChange}
+        />
+      </label>
+      <label>
+        Last name:
+        <input
+          name="lastName"
+          value={person.lastName}
+          onChange={handleChange}
+        />
+      </label>
+      <label>
+        Email:
+        <input name="email" value={person.email} onChange={handleChange} />
+      </label>
+      <p>
+        {person.firstName} {person.lastName} ({person.email})
+      </p>
+    </>
+  );
+}
+```
+
+- 스프레드 문법을 사용하여 기존에 존재하는 다른 데이터들도 복사해야한다.
+
+<br>
+
+## Immer
+
+<br>
+
+```javascript
+import { useState } from "react";
+
+export default function Form() {
+  const [person, setPerson] = useState({
+    name: "Niki de Saint Phalle",
+    artwork: {
+      title: "Blue Nana",
+      city: "Hamburg",
+      image: "https://i.imgur.com/Sd1AgUOm.jpg",
+    },
+  });
+
+  function handleNameChange(e) {
+    setPerson({
+      ...person,
+      name: e.target.value,
+    });
+  }
+
+  function handleTitleChange(e) {
+    setPerson({
+      ...person,
+      artwork: {
+        ...person.artwork,
+        title: e.target.value,
+      },
+    });
+  }
+
+  function handleCityChange(e) {
+    setPerson({
+      ...person,
+      artwork: {
+        ...person.artwork,
+        city: e.target.value,
+      },
+    });
+  }
+
+  function handleImageChange(e) {
+    setPerson({
+      ...person,
+      artwork: {
+        ...person.artwork,
+        image: e.target.value,
+      },
+    });
+  }
+}
+```
+
+<br>
+
+- 위 코드는 `useImmer`을 사용하여 아래코드처럼 바꿀 수 있다.
+
+<br>
+
+```javascript
+import { useImmer } from "use-immer";
+
+export default function Form() {
+  const [person, updatePerson] = useImmer({
+    name: "Niki de Saint Phalle",
+    artwork: {
+      title: "Blue Nana",
+      city: "Hamburg",
+      image: "https://i.imgur.com/Sd1AgUOm.jpg",
+    },
+  });
+
+  function handleNameChange(e) {
+    updatePerson((draft) => {
+      draft.name = e.target.value;
+    });
+  }
+
+  function handleTitleChange(e) {
+    updatePerson((draft) => {
+      draft.artwork.title = e.target.value;
+    });
+  }
+
+  function handleCityChange(e) {
+    updatePerson((draft) => {
+      draft.artwork.city = e.target.value;
+    });
+  }
+
+  function handleImageChange(e) {
+    updatePerson((draft) => {
+      draft.artwork.image = e.target.value;
+    });
+  }
+
+  return (
+    <>
+      <label>
+        Name:
+        <input value={person.name} onChange={handleNameChange} />
+      </label>
+      <label>
+        Title:
+        <input value={person.artwork.title} onChange={handleTitleChange} />
+      </label>
+      <label>
+        City:
+        <input value={person.artwork.city} onChange={handleCityChange} />
+      </label>
+      <label>
+        Image:
+        <input value={person.artwork.image} onChange={handleImageChange} />
+      </label>
+      <p>
+        <i>{person.artwork.title}</i>
+        {" by "}
+        {person.name}
+        <br />
+        (located in {person.artwork.city})
+      </p>
+      <img src={person.artwork.image} alt={person.artwork.title} />
+    </>
+  );
+}
+```
+
+- Immer는 업데이트 핸들러를 간결하게 관리할 수 있는 좋은 방법이다.
+- 특히, state가 중첩되어 있고 객체를 복사하는 것이 중복되는 코드를 만들 때 유용하다.
+
+<br>
+
+## 👨‍💻 정리
+
+- 리액트의 state는 불변한 것으로 다루어라.
+- state에 객체를 저장할 때, 객체를 변경하는 것은 렌더링을 발생시키지 않으며 이전 렌더 "스냅샷"의 state를 바꿀 것이다.
+- 객체를 변경하는 대신 새로운 객체를 생성하여 state를 설정하여 렌더링을 일으키자.
+- 객체의 복사본을 만들기 위해 스프레드 문법을 사용하자.
+- 스프레드 문법은 얕다. 한 레벨 깊이만 복사한다.
+- 중첩된 객체를 업데이트하 기위해서는 변경하는 부분부터 모든 항목의 복사본을 만들어야한다.
+- 반복적인 복사 코드를 줄이기 위해서 Immer를 사용하라.
